@@ -1,0 +1,15 @@
+-producer----> kafka (middle man)<---------- consumer (in rmq publisher)
+-producer send events  = key value pairs with metadata
+-kafka save and orgnize these events into topics (channels/queues in rmq)
+-kafka used for real time data and analysis and enables chains reactions
+-kafka is scalable based on the traffic's volume ????how -----> partitions
+-topic are devided into partitions for parallel processing
+-kafka have persistent data (after 7 days delete or when 100gb delete)
+-each message has an offset (like an id)
+-we can have consumer groupe each one consume on partition
+-a kafka server is called a broker
+- brokers= kafka cluster
+
+Each partition has: 
+*Leader Handles:reads & writes
+*Replica Backup copy.
