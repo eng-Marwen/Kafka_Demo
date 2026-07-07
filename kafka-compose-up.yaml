@@ -1,0 +1,79 @@
+services:
+  kafka:
+    image: apache/kafka:4.3.1
+    container_name: kafka-container
+
+    ports:
+      - "9092:9092" # Expose Kafka broker port to your host machine
+
+    environment:
+
+      # Unique ID of this Kafka server in the cluster
+      KAFKA_NODE_ID: 1
+
+
+      # Define the role of this node:
+      # broker = handles messages (produce/consume)
+      # controller = manages cluster metadata (KRaft)
+      KAFKA_PROCESS_ROLES: broker,controller
+
+
+      # Defines which nodes are controllers in the KRaft quorum
+      # Format: node_id@hostname:controller_port
+      # Here: node 1 is the only controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+
+
+      # Network interfaces Kafka listens on inside the container
+      #
+      # PLAINTEXT://:9092  -> client connections
+      # CONTROLLER://:9093 -> KRaft controller communication
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+
+
+      # Address given to clients so they know how to connect
+      #
+      # localhost:9092 means applications running on your machine
+      # can connect to Kafka
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+
+
+      # Tells Kafka which listener is used for controller communication
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+
+
+      # Number of replicas for Kafka internal offsets topic
+      #
+      # Single node cluster => must be 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+
+      # Number of replicas for transaction logs
+      # Required for exactly-once semantics
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
+
+      # Minimum number of brokers that must acknowledge transaction logs
+      # Single broker => 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+
+
+      # Replication factor for Kafka internal group metadata
+      # Single broker => 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
+
+      # Default number of partitions for automatically created topics
+      # Useful for development
+      KAFKA_NUM_PARTITIONS: 3
+
+
+      # Automatically create topics when a producer sends to a new topic
+      # Development only; usually false in production
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+    volumes:
+      - kafka-data:/var/lib/kafka/data #this path is inside the container, where Kafka stores its data
+                                        #kafka-data is the folder on host machine where Kafka data will be persisted, even if the container is removed
+volumes:
+  kafka-data:
