@@ -1,3 +1,3 @@
-FROM alpine:3.22
-
-CMD ["echo", "Hello World"]
+FROM nginx:alpine
+RUN echo "Hello from CloudForge!" > /usr/share/nginx/html/index.html
+EXPOSE 80
